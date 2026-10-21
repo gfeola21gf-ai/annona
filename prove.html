@@ -1,0 +1,79 @@
+<!doctype html>
+<!-- prove.html — controlla da sola i calcoli di logica/energia.js e logica/attivita.js.
+     Apri http://localhost:8000/prove.html : ogni riga deve essere verde. -->
+<html lang="it"><head><meta charset="utf-8"><title>Prove calcoli</title>
+<style>body{font:15px system-ui;padding:16px}li{margin:4px 0}.ok{color:#2e7d32}.no{color:#c62828;font-weight:700}</style></head>
+<body><h1>Prove dei calcoli</h1><ul id="esiti"></ul><p id="totale"></p>
+<script type="module">
+import * as E from "./logica/energia.js";
+import * as G from "./logica/giorni.js";
+import * as U from "./ui.js";
+import * as A from "./logica/attivita.js";
+const ul = document.getElementById("esiti"); let falliti = 0;
+const prova = (nome, avuto, atteso) => {
+  const ok = JSON.stringify(avuto) === JSON.stringify(atteso);
+  if (!ok) falliti++;
+  ul.insertAdjacentHTML("beforeend", `<li class="${ok ? "ok" : "no"}">${ok ? "✓" : "✗"} ${nome}: ${JSON.stringify(avuto)}${ok ? "" : " (atteso " + JSON.stringify(atteso) + ")"}</li>`);
+};
+prova("Basale uomo 80 kg, 180 cm, 30 anni", E.basale({ sesso: "M", eta: 30, altezza: 180, peso: 80 }), 1780);
+prova("Numero: punto delle migliaia anche a 4 cifre", [U.numero(1824), U.numero(12345), U.numero(-2374), U.numero(0.44, 2), U.kg(77)], ["1.824", "12.345", "−2.374", "0,44", "77,0"]);
+prova("Lettura: 1.780 / 78,4 / 78.4 / 1.780,5", [U.leggiNumero("1.780"), U.leggiNumero("78,4"), U.leggiNumero("78.4"), U.leggiNumero("1.780,5")], [1780, 78.4, 78.4, 1780.5]);
+prova("Basale donna 60 kg, 165 cm, 40 anni", E.basale({ sesso: "F", eta: 40, altezza: 165, peso: 60 }), 1270);
+const b = E.bilancioGiorno({ basaleKcal: 1780, pasti: [{ kcal: 1500 }, { kcal: 500 }], attivita: [{ kcal: 400 }], obiettivoKcal: -550 });
+prova("Fabbisogno = basale + attività", b.fabbisogno, 2180);
+prova("Fabbisogno = basale × 1,3 + attività", E.bilancioGiorno({ basaleKcal: 1780, pasti: [], attivita: [{ kcal: 400 }], fattore: 1.3 }).fabbisogno, 2714);
+prova("Domande guida: ufficio, auto, faccende → basso", E.LIVELLI[E.livelloDalleRisposte({ lavoro: 1, spostamenti: 0, casa: 1 })].id, "basso");
+prova("Domande guida + 7-10 mila passi → medio", E.LIVELLI[E.livelloDalleRisposte({ lavoro: 1, spostamenti: 0, casa: 1, passi: 2 })].id, "medio");
+prova("Domande guida: lavoro pesante + tanti passi → molto alto", E.LIVELLI[E.livelloDalleRisposte({ lavoro: 3, spostamenti: 1, casa: 1, passi: 3 })].id, "molto-alto");
+prova("Taratura: fattore 1,37 → medio", E.livelloVicino(1.37).id, "medio");
+prova("Bilancio (2000 mangiate) = deficit 180", b.bilancio, -180);
+prova("Da mangiare per l'obiettivo −550", b.daMangiare, 1630);
+prova("Restano (negativo = oltre il piano)", b.restano, -370);
+prova("Ritmo −0,5 kg/sett → kcal al giorno", E.kcalGiornalierePerRitmo(-0.5), -550);
+prova("−550 kcal/giorno → kg a settimana", Math.round(E.kgSettimanaDa(-550) * 100) / 100, -0.5);
+const giorni = [
+  { giorno: "2026-10-07", bilancio: -9999 },   // fuori finestra (8 giorni fa)
+  { giorno: "2026-10-12", bilancio: -400 },
+  { giorno: "2026-10-14", bilancio: -600 },
+  { giorno: "2026-10-15", bilancio: -2000 },   // oggi: escluso
+];
+const pr = E.previsione(giorni, "2026-10-15");
+prova("Previsione: media dei giorni completi", pr.mediaKcal, -500);
+prova("Previsione: giorni usati", pr.giorniUsati, 2);
+prova("Previsione senza dati", E.previsione([], "2026-10-15"), null);
+const mm = E.mediaMobile([
+  { quando: "2026-10-01T07:00:00", kg: 80 }, { quando: "2026-10-03T07:00:00", kg: 79 },
+  { quando: "2026-10-07T07:00:00", kg: 78 }, { quando: "2026-10-09T07:00:00", kg: 77 },
+]).map((p) => Math.round(p.media * 100) / 100);
+prova("Media mobile 7 giorni", mm, [80, 79.5, 79, 78]);
+prova("Settimane all'obiettivo (80→74 a −0,5)", E.settimaneAllObiettivo(80, 74, -0.5), 12);
+prova("Avanzamento 80→78 verso 74", Math.round(E.avanzamento(80, 78, 74) * 100), 33);
+prova("Giorno prima", G.aggiungiGiorni("2026-03-01", -1), "2026-02-28");
+prova("Età", G.etaDa("1990-10-16", new Date(2026, 9, 15)), 35);
+prova("Grammi: 360 kcal/100g × 90 g", E.perGrammi(360, 90), 324);
+{ // stallo: 21 giorni a −500 kcal, ma il peso scende solo di 1 etto
+  const giorni = Array.from({ length: 21 }, (_, i) => ({ giorno: G.aggiungiGiorni("2026-10-16", -21 + i), mangiato: 1300, bilancio: -500 }));
+  const pesate = ["2026-09-25", "2026-09-27", "2026-10-10", "2026-10-13"].map((g, i) => ({ quando: `${g}T07:00:00`, kg: i < 2 ? 80 : 79.9 }));
+  const s = E.valutaStallo(giorni, pesate, "2026-10-16");
+  prova("Stallo: atteso / reale", `${s.atteso} / ${s.reale}`, "-0.9 / -0.1");
+  prova("Stallo riconosciuto", s.stallo, true);
+  prova("Fabbisogno reale stimato", s.fabbisognoReale, 1355);
+  prova("Stallo: pochi giorni registrati → null", E.valutaStallo(giorni.slice(0, 10), pesate, "2026-10-16"), null);
+  const pesateGiu = pesate.map((p, i) => ({ ...p, kg: i < 2 ? 80 : 79.2 }));
+  prova("Nessuno stallo se il peso scende", E.valutaStallo(giorni, pesateGiu, "2026-10-16").stallo, false);
+}
+prova("Macro: carboidrati = il resto", JSON.stringify(E.ripartizione({ p: 40, g: 25 })), JSON.stringify({ c: 35, p: 40, g: 25 }));
+prova("Macro: passi di 5 e minimo 5% ai carboidrati", JSON.stringify(E.ripartizione({ p: 62, g: 41 })), JSON.stringify({ c: 5, p: 60, g: 35 }));
+prova("Macro: grammi su 1.400 kcal (40/30/30)", JSON.stringify(E.grammiMacro(1400, { p: 30, g: 30 })), JSON.stringify({ c: 140, p: 105, g: 47 }));
+const io = { peso: 78, eta: 41, sesso: "M", basale: 1740 };
+prova("Attività: corsa 45 min, zona 3 (MET 9,3)", A.kcalAttivita({ ...io, tipo: "corsa", minuti: 45, zona: 3 }), { kcal: 486, fonte: "intensita", met: 9.3 });
+prova("Attività: corsa 7,2 km → dai km", A.kcalAttivita({ ...io, tipo: "corsa", minuti: 45, zona: 3, km: 7.2 }), { kcal: 534, fonte: "km" });
+prova("Attività: kcal dell'orologio vincono su tutto", A.kcalAttivita({ ...io, tipo: "corsa", minuti: 45, km: 7.2, battito: 150, kcalOrologio: 412 }), { kcal: 412, fonte: "orologio" });
+prova("Attività: battito medio 140 per 40 min (Keytel)", A.kcalAttivita({ ...io, tipo: "corsa", minuti: 40, zona: 3, battito: 140 }), { kcal: 497, fonte: "battito" });
+prova("Attività: battito troppo basso → si usa l'intensità", A.kcalAttivita({ ...io, tipo: "corsa", minuti: 40, zona: 3, battito: 80 }).fonte, "intensita");
+prova("Attività: «Altro» col MET dell'IA", A.kcalAttivita({ ...io, tipo: "altro", minuti: 60, metIA: A.metDaKcal(312, 78, 60) }), { kcal: 312, fonte: "ia", met: 5 });
+prova("Attività: senza minuti → nessun conto", A.kcalAttivita({ ...io, tipo: "pesi", zona: 3 }), null);
+prova("Attività: kettlebell 30 min, zona 4 (MET 9,8)", A.kcalAttivita({ ...io, tipo: "kettlebell", minuti: 30, zona: 4 }), { kcal: 343, fonte: "intensita", met: 9.8 });
+prova("Battito massimo a 41 anni e zona 3", [A.battitoMassimo(41), A.battitiZona(3, 41)], [179, [125, 143]]);
+document.getElementById("totale").textContent = falliti ? `❌ ${falliti} prove fallite` : "✅ Tutte le prove superate";
+</script></body></html>

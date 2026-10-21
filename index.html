@@ -1,0 +1,37 @@
+<!doctype html>
+<!-- =========================================================
+     index.html — il "guscio" di Annona.
+     È quasi vuoto: le schermate le disegna app.js dentro <main>.
+     ========================================================= -->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <!-- Adatta la pagina allo schermo del telefono (anche sotto la "tacca") -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Annona</title>
+  <meta name="description" content="Razioni sagge, giorno dopo giorno: calorie, deficit, peso e motivazione.">
+  <meta name="theme-color" content="#FFFBF3" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1F1814" media="(prefers-color-scheme: dark)">
+
+  <!-- Per farla diventare un'"app" quando la aggiungi alla schermata Home -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icone/icona-180.png">
+  <link rel="icon" type="image/png" href="icone/icona-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Annona">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <!-- I tre caratteri romani: Cinzel (monumentale), Cormorant Garamond (classico), Gelasio (leggibile) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=Gelasio:wght@400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="app"><p class="caricamento">Annona</p></main>
+  <noscript>Annona ha bisogno di JavaScript attivo.</noscript>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

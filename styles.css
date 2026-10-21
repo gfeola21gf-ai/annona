@@ -1,0 +1,766 @@
+/* =========================================================
+   styles.css — l'ASPETTO di Annona.
+
+   Identità: la dispensa romana.
+   - Colori: papiro, terracotta, grano, oliva, inchiostro bruno
+   - Tre livelli di carattere:
+       1 MONUMENTALE  Cinzel             titoli, pulsanti, etichette
+       2 CLASSICO     Cormorant Garamond numeri grandi, giuramento, nomi
+       3 LEGGIBILE    Gelasio            testi e numeri piccoli
+   Pensata per 375×667 (iPhone SE). Tema chiaro e scuro automatici.
+   ========================================================= */
+
+/* ---------- Colori ---------- */
+:root {
+  --sfondo: #EFE5D3; --carta: #FFFBF3; --tenue: #F4EADA; --inchiostro: #2B1E17; --grigio: #7E6857; --linea: #E3D3BA;
+  --terra: #B4502C; --su-terra: #FFF6E8; --grano: #D99A2B; --grano-chiaro: #F5E2B6; --oliva: #56702F; --bronzo: #C9933A;
+  --errore: #B3261E;
+  --monumentale: "Cinzel", Georgia, serif;
+  --classico: "Cormorant Garamond", Georgia, serif;
+  --leggibile: "Gelasio", Georgia, serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sfondo: #130F0C; --carta: #1F1814; --tenue: #2A211B; --inchiostro: #F4EADB; --grigio: #AE9A86; --linea: #3A2E25;
+    --terra: #C2603A; --grano: #E5AE4A; --grano-chiaro: #33281C; --oliva: #93AD63; --bronzo: #D6A24A; --errore: #F2867A;
+    color-scheme: dark;
+  }
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; margin: 0; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+html { background: var(--carta); }
+body {
+  background: var(--carta); color: var(--inchiostro);
+  font-family: var(--leggibile); font-size: 15px; line-height: 1.35;
+  -webkit-text-size-adjust: 100%; overscroll-behavior-y: none;
+  font-variant-numeric: lining-nums;   /* cifre tutte alte: lo 0 non sembra una o */
+}
+button, input, textarea, select { font: inherit; color: inherit; font-variant-numeric: lining-nums; }
+::placeholder { font-variant-numeric: lining-nums; }
+button { background: none; border: 0; padding: 0; cursor: pointer; text-align: inherit; }
+a { color: inherit; text-decoration: none; }
+input, textarea { -webkit-appearance: none; appearance: none; }
+.ic { width: 20px; height: 20px; flex: none; }
+.t { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.premuto { transform: scale(.96); opacity: .85; }
+button, a { transition: transform .08s, opacity .08s; }
+button:disabled { opacity: .45; cursor: default; }
+:focus-visible { outline: 2px solid var(--terra); outline-offset: 2px; }
+
+/* lo spazio dell'app: rispetta la tacca e la barra in basso dell'iPhone */
+#app { min-height: 100dvh; display: flex; flex-direction: column; }
+.contenuto {
+  flex: 1; display: flex; flex-direction: column; gap: 12px;
+  padding: calc(env(safe-area-inset-top) + 10px) 16px 20px;
+  max-width: 480px; width: 100%; margin: 0 auto;
+}
+#app:has(.barra) .contenuto { padding-bottom: calc(env(safe-area-inset-bottom) + 92px); }
+.caricamento { margin: 40vh auto 0; font-family: var(--monumentale); letter-spacing: .1em; color: var(--grigio); }
+
+/* ---------- Tipografia ---------- */
+.titolo-romano { font-family: var(--monumentale); font-weight: 700; letter-spacing: .05em; text-transform: uppercase; font-size: 18px; }
+h1.titolo-romano { font-size: 19px; }
+.sopra { font-family: var(--monumentale); font-size: 11px; letter-spacing: .16em; font-weight: 600; color: var(--grigio); text-transform: uppercase; }
+h2.sopra { margin-top: 6px; }
+.classico { font-family: var(--classico); font-weight: 700; }
+.piccolo { font-size: 12.5px; color: var(--grigio); display: flex; gap: 6px; align-items: center; }
+.piccolo .ic { width: 14px; height: 14px; }
+.sotto { color: var(--grigio); font-size: 14px; }
+.centro { text-align: center; justify-content: center; }
+.errore { color: var(--errore); font-size: 14px; }
+.num, .grande, .kcal { font-variant-numeric: lining-nums tabular-nums; }
+
+/* ---------- Marchio ---------- */
+.marchio { display: inline-flex; align-items: center; gap: 7px; }
+.marchio .ic { width: 22px; height: 22px; color: var(--grano); }
+.marchio b { font-family: var(--monumentale); font-weight: 700; font-size: 19px; letter-spacing: .16em; }
+
+/* ---------- Pulsanti ---------- */
+.pillola {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border-radius: 99px; background: var(--inchiostro); color: var(--carta);
+  font-family: var(--monumentale); font-weight: 700; font-size: 14px; letter-spacing: .06em;
+  min-height: 48px; padding: 0 20px; text-align: center;
+}
+.pillola.terra { background: var(--terra); color: var(--su-terra); }
+.pillola.larga { width: 100%; }
+.pillola .ic { width: 18px; height: 18px; }
+.tondo {
+  width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--linea);
+  display: grid; place-items: center; background: var(--carta); color: var(--inchiostro); flex: none;
+}
+.tondo.trasparente { background: transparent; }
+.tondo.invisibile { visibility: hidden; }
+.piccolo-tondo { width: 36px; height: 36px; border: 0; background: transparent; color: var(--grigio); }
+.piccolo-tondo .ic { width: 18px; height: 18px; }
+
+.intest { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+
+/* ---------- Barra in basso ---------- */
+.barra {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: space-around;
+  height: calc(68px + env(safe-area-inset-bottom)); padding: 0 8px env(safe-area-inset-bottom);
+  background: var(--carta); border-top: 1px solid var(--linea);
+}
+.barra a { display: flex; flex-direction: column; align-items: center; gap: 3px; width: 60px; color: var(--grigio);
+  font-family: var(--monumentale); font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.barra a .ic { width: 22px; height: 22px; }
+.barra a.attiva { color: var(--terra); }
+.barra .piu { width: 54px; height: 54px; border-radius: 50%; background: var(--terra); color: var(--su-terra);
+  display: grid; place-items: center; margin-top: -24px; box-shadow: 0 6px 16px rgba(120, 40, 10, .3); }
+.barra .piu .ic { width: 26px; height: 26px; }
+
+/* ---------- Moduli ---------- */
+.modulo { display: flex; flex-direction: column; gap: 14px; }
+.campo { display: flex; flex-direction: column; gap: 6px; }
+.campo > span { font-size: 13px; color: var(--grigio); }
+.campo input, .risposta textarea, .voce-card textarea, .cerca input {
+  width: 100%; border: 1.5px solid var(--linea); background: var(--carta); border-radius: 16px;
+  padding: 12px 14px; font-size: 16px; /* 16px: l'iPhone non fa lo zoom quando tocchi il campo */
+}
+.campo input:focus, textarea:focus { outline: none; border-color: var(--terra); }
+.grande-campo input { font-family: var(--classico); font-weight: 700; font-size: 34px; padding: 8px 14px; text-align: center; }
+.campi-due { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.scelte { display: flex; gap: 8px; }
+.scelte.colonna { flex-direction: column; }
+.scelta { flex: 1; position: relative; }
+.scelta input { position: absolute; opacity: 0; pointer-events: none; }
+.scelta > span { display: flex; flex-direction: column; gap: 2px; border: 1.5px solid var(--linea); border-radius: 16px; padding: 12px 14px; background: var(--carta); }
+.scelte.due .scelta > span { align-items: center; font-family: var(--monumentale); font-weight: 700; letter-spacing: .06em; }
+.scelta b { font-family: var(--classico); font-size: 19px; }
+.scelta small { color: var(--grigio); font-size: 12.5px; }
+.scelta input:checked + span { border-color: var(--terra); background: var(--grano-chiaro); }
+
+/* ---------- Accesso ---------- */
+.accesso { display: flex; flex-direction: column; gap: 12px; padding-top: 10px; }
+.accesso-mascotte { display: grid; place-items: center; }
+.accesso-mascotte .mascotte { width: 110px; height: 138px; }
+.accesso h1 { text-align: center; font-size: 30px; }
+.accesso .sotto { text-align: center; margin-bottom: 8px; }
+
+/* ---------- Onboarding ---------- */
+.schermata-benvenuto, .schermata-benvenuto .contenuto, .schermata-accesso { background: var(--sfondo); }
+.onboarding { display: flex; flex-direction: column; gap: 14px; min-height: calc(100dvh - 40px); }
+.testa-passi { display: flex; justify-content: space-between; align-items: center; }
+.conta { font-size: 13px; font-weight: 600; }
+.passi { display: flex; gap: 6px; }
+.passi i { height: 6px; flex: 1; border-radius: 3px; background: var(--linea); }
+.passi i.fatto { background: var(--terra); }
+.onb-corpo { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.onboarding h1 { font-size: 26px; line-height: 1.15; }
+.onb-mascotte { display: grid; place-items: center; }
+.onb-mascotte .mascotte { height: 140px; width: 112px; }
+.risposta { background: var(--carta); border-radius: 22px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.risposta textarea { border: 0; padding: 0; font-family: var(--classico); font-style: italic; font-weight: 500; font-size: 20px; line-height: 1.25; resize: none; background: transparent; min-height: 78px; }
+.riga-tra { display: flex; justify-content: space-between; }
+.riepilogo { display: flex; flex-direction: column; gap: 8px; }
+.riepilogo > div { background: var(--carta); border-radius: 18px; padding: 10px 14px; display: flex; flex-direction: column; }
+.riepilogo small { font-family: var(--monumentale); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--grigio); font-weight: 600; }
+.riepilogo strong { font-size: 26px; line-height: 1.1; }
+.riepilogo span { font-size: 13px; color: var(--grigio); }
+.nota-avviso { display: flex; gap: 8px; font-size: 13px; background: var(--grano-chiaro); border-radius: 16px; padding: 10px 12px; }
+.nota-avviso .ic { width: 16px; height: 16px; color: var(--terra); margin-top: 1px; }
+
+/* ---------- Oggi ---------- */
+.saluto { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+.naviga-giorno { display: flex; align-items: center; gap: 2px; font-size: 13.5px; font-weight: 600; }
+.freccia { width: 32px; height: 32px; display: grid; place-items: center; color: var(--grigio); }
+.freccia .ic { width: 18px; height: 18px; }
+
+.giuramento { display: flex; gap: 12px; align-items: flex-start; width: 100%; background: var(--grano-chiaro); border-radius: 22px; padding: 12px 14px; }
+.giuramento > span { display: flex; flex-direction: column; gap: 2px; }
+.alloro { width: 34px; height: 34px; color: var(--oliva); }
+.giuramento-testo { font-family: var(--classico); font-style: italic; font-weight: 500; font-size: 18px; line-height: 1.22; }
+.giuramento-altro { font-size: 13.5px; margin-top: 6px; }
+.giuramento-altro b { font-family: var(--monumentale); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; display: block; color: var(--grigio); }
+
+/* Blocco 1 · Razioni: kcal rimanenti/mangiate e macronutrienti */
+.razioni-oggi { background: var(--tenue); border-radius: 24px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.ro-numeri { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
+.ro-numeri small { display: block; font-family: var(--monumentale); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--grigio); }
+.ro-numeri .principale strong { font-family: var(--classico); font-weight: 700; font-size: 44px; line-height: .95; }
+.ro-numeri .principale strong span { font-family: var(--leggibile); font-size: 14px; font-weight: 600; margin-left: 3px; }
+.ro-numeri .principale.oltre strong { color: var(--terra); }
+.ro-numeri .lato { text-align: right; }
+.ro-numeri .lato strong { font-family: var(--classico); font-weight: 700; font-size: 26px; line-height: 1; }
+.ro-barra { position: relative; height: 14px; border-radius: 99px; background: var(--linea); overflow: hidden; }
+.ro-barra i { position: absolute; inset: 0 auto 0 0; border-radius: 99px; background: linear-gradient(90deg, var(--grano), var(--terra)); transition: width .5s; }
+.ro-barra.oltre i { background: var(--terra); }
+.ro-barra.oltre b { position: absolute; top: 0; bottom: 0; right: 0; background: repeating-linear-gradient(-45deg, rgba(255, 255, 255, .35) 0 4px, transparent 4px 8px); }
+.ro-scala { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--grigio); margin-top: -4px; }
+.macro-righe { display: flex; flex-direction: column; gap: 7px; }
+.macro-righe div { display: grid; grid-template-columns: 82px 1fr 76px; align-items: center; gap: 10px; }
+.macro-righe small { font-family: var(--monumentale); font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--grigio); }
+.mb { height: 8px; border-radius: 99px; background: var(--linea); overflow: hidden; }
+.mb i { display: block; height: 100%; border-radius: 99px; transition: width .5s; }
+.macro-righe p { text-align: right; font-size: 12.5px; }
+.macro-righe p b { font-family: var(--classico); font-size: 17px; }
+.macro-righe .oltre p b { color: var(--terra); }
+.c-carbo { background: var(--grano); } .c-prot { background: var(--terra); } .c-grassi { background: var(--oliva); }
+
+/* Blocco 2 · Bilancio: deficit/surplus, basale + attività, kg a settimana */
+.bilancio { background: var(--terra); color: var(--su-terra); border-radius: 24px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.bilancio small { font-size: 13px; opacity: .9; }
+.grande { font-family: var(--classico); font-weight: 700; font-size: 50px; line-height: .95; letter-spacing: -.5px; }
+.grande span { font-family: var(--leggibile); font-size: 15px; font-weight: 600; margin-left: 3px; letter-spacing: 0; }
+.b2-due { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 10px; }
+.b2-due .kg { text-align: right; }
+.b2-due .kg strong { display: block; font-family: var(--classico); font-weight: 700; font-size: 28px; line-height: 1; white-space: nowrap; }
+.b2-due .kg strong .ic { width: 18px; height: 18px; color: #F5E2B6; margin-right: 2px; }
+.b2-due .kg small { font-size: 11.5px; opacity: .85; }
+.b2-linea { height: 1px; background: rgba(255, 246, 232, .25); }
+/* una riga sola anche sull'iPhone SE: basale × movimento + attività = fabbisogno */
+.b2-conto { display: flex; justify-content: space-between; gap: 6px; white-space: nowrap; font-size: 12px; opacity: .92; }
+.b2-conto b { font-family: var(--classico); font-size: 15px; }
+
+.titolo-sez h2 { font-family: var(--monumentale); font-size: 15px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; margin-top: 4px; }
+.pasti { display: flex; flex-direction: column; gap: 8px; }
+.pasto { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 12px 8px 8px; border-radius: 20px; background: var(--tenue); }
+.pasto.vuoto { background: transparent; border: 1.5px dashed var(--linea); }
+.pall { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--carta); flex: none; }
+.pall .ic { width: 18px; height: 18px; }
+.pasto-testo { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.pasto-testo strong { font-family: var(--classico); font-size: 18px; font-weight: 700; line-height: 1.1; }
+.pasto-testo small { font-size: 12px; color: var(--grigio); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kcal { font-weight: 600; font-size: 14.5px; }
+.aggiungi-mini { color: var(--terra); }
+
+/* ---------- Voci (vassoio, foglio, pesate) ---------- */
+.voce { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--linea); }
+.voce:last-child { border-bottom: 0; }
+.voce-nome { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.voce-nome strong { font-family: var(--classico); font-size: 17px; font-weight: 700; line-height: 1.15; }
+.voce-nome small { font-size: 12px; color: var(--grigio); }
+.voce .kcal { width: 46px; text-align: right; }
+.vassoio, .voci, .elenco-pesate { border: 1px solid var(--linea); border-radius: 20px; padding: 2px 12px; }
+
+/* ---------- Aggiungi ---------- */
+.aggiungi { display: flex; flex-direction: column; gap: 12px; }
+.segmenti { display: flex; background: var(--tenue); border-radius: 99px; padding: 4px; gap: 4px; }
+.segmenti button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 0; border-radius: 99px;
+  font-family: var(--monumentale); font-weight: 700; font-size: 12.5px; letter-spacing: .06em; color: var(--grigio); }
+.segmenti button .ic { width: 16px; height: 16px; }
+.segmenti button[aria-selected="true"] { background: var(--inchiostro); color: var(--carta); }
+.chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: 1; border-radius: 99px; padding: 8px 6px; text-align: center; background: var(--tenue); white-space: nowrap;
+  font-family: var(--monumentale); font-weight: 600; font-size: 11.5px; letter-spacing: .03em; }
+.chip.attiva { background: var(--inchiostro); color: var(--carta); }
+.voce-card { background: var(--grano-chiaro); border-radius: 26px; padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.voce-card textarea { background: var(--carta); border: 0; border-radius: 18px; font-family: var(--classico); font-style: italic; font-size: 18px; font-weight: 500;
+  resize: none; text-align: center; line-height: 1.3; padding: 12px 18px; min-height: 72px; overflow-y: hidden;
+  overflow-wrap: break-word; scrollbar-width: none; }
+.voce-card textarea::-webkit-scrollbar { display: none; }
+.tasti { display: flex; align-items: center; gap: 22px; }
+.grande-tondo { width: 58px; height: 58px; border: 0; flex-direction: column; display: flex; align-items: center; justify-content: center; gap: 1px; }
+.grande-tondo small { font-size: 10px; color: var(--grigio); }
+.grande-tondo.spento { opacity: .5; }
+/* Foto e Codice: due tasti larghi, sobri e uguali (carta, bordo sottile, icona terracotta) al posto del vecchio microfono */
+.due-tasti { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+.tasto-largo { display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 18px; padding: 13px 8px;
+  background: var(--carta); color: var(--inchiostro); border: 1.5px solid var(--linea);
+  font-family: var(--monumentale); font-weight: 700; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; }
+.tasto-largo .ic { width: 20px; height: 20px; color: var(--terra); }
+.tasto-largo:disabled { opacity: .5; }
+.stima { background: var(--inchiostro); min-height: 42px; font-size: 13px; }
+.rotella { width: 16px; height: 16px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: gira .8s linear infinite; }
+@keyframes gira { to { transform: rotate(360deg); } }
+.cerca { display: flex; align-items: center; gap: 8px; position: relative; }
+.cerca .ic { position: absolute; left: 14px; color: var(--grigio); }
+.cerca input { border-radius: 99px; padding-left: 42px; background: var(--tenue); border-color: transparent; }
+.risultati { display: flex; flex-direction: column; }
+.risultati:empty { display: none; }
+.risultato { display: flex; align-items: center; gap: 10px; padding: 9px 4px; border-bottom: 1px solid var(--linea); }
+.risultato .ic { color: var(--terra); }
+.risultato-nome { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.risultato-nome strong { font-family: var(--classico); font-size: 17px; font-weight: 700; line-height: 1.15; }
+.risultato-nome small { font-size: 12px; color: var(--grigio); }
+.oppure { display: flex; align-items: center; gap: 10px; color: var(--grigio); font-size: 12.5px; }
+.oppure::before, .oppure::after { content: ""; flex: 1; height: 1px; background: var(--linea); }
+.piede { position: sticky; bottom: 0; padding: 12px 16px calc(env(safe-area-inset-bottom) + 12px); background: linear-gradient(transparent, var(--carta) 30%); max-width: 480px; width: 100%; margin: 0 auto; }
+.schermata-aggiungi .contenuto { padding-bottom: 0; }
+
+/* ---------- Peso ---------- */
+/* il numero in primo piano a sinistra, il legionario sulla bilancia a destra, sotto l'obiettivo */
+.peso-card { background: var(--grano-chiaro); border-radius: 26px; padding: 16px 10px 16px 18px; display: flex; align-items: center; gap: 4px; }
+.peso-card .mascotte { width: 122px; height: 152px; flex: none; order: 2; }
+.peso-num { flex: 1; min-width: 0; order: 1; }
+.peso-num small { font-size: 12.5px; color: var(--grigio); display: block; }
+.peso-num .grande { font-size: 60px; }
+.delta { display: inline-flex; background: var(--carta); border-radius: 99px; padding: 3px 10px; font-size: 13px; font-weight: 600; margin-top: 8px; }
+.delta.buono { color: var(--oliva); }
+.periodi { display: flex; gap: 4px; background: var(--tenue); border-radius: 99px; padding: 4px; }
+.periodi button { flex: 1; text-align: center; padding: 8px 0; border-radius: 99px; color: var(--grigio);
+  font-family: var(--monumentale); font-weight: 600; font-size: 11.5px; letter-spacing: .03em; }
+.periodi button[aria-selected="true"] { background: var(--inchiostro); color: var(--carta); }
+.grafico { border: 1px solid var(--linea); border-radius: 22px; padding: 10px 8px 4px; }
+.legenda { display: flex; gap: 14px; font-size: 12px; color: var(--grigio); padding: 0 6px 2px; }
+.legenda i { display: inline-block; vertical-align: middle; margin-right: 5px; }
+.leg-punto { width: 8px; height: 8px; border-radius: 50%; border: 2px solid var(--grigio); }
+.leg-linea { width: 16px; height: 3px; border-radius: 2px; background: var(--terra); }
+.grafico-svg { width: 100%; height: auto; display: block; }
+.g-griglia { stroke: var(--linea); stroke-width: 1; }
+.g-testo { fill: var(--grigio); font-size: 10px; font-family: var(--leggibile); }
+.g-media { fill: none; stroke: var(--terra); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+.g-punto { fill: var(--carta); stroke: var(--grigio); stroke-width: 2; }
+.g-ultima { fill: var(--inchiostro); }
+.grafico-vuoto { text-align: center; color: var(--grigio); padding: 40px 0; font-size: 14px; }
+.elenco-pesate .voce-nome strong { font-size: 18px; }
+
+/* ---------- Io ---------- */
+.gruppo { background: var(--tenue); border-radius: 20px; overflow: hidden; }
+.riga-profilo { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; border-bottom: 1px solid var(--linea); }
+.riga-profilo:last-child { border-bottom: 0; }
+.riga-profilo > span { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.riga-profilo small { font-size: 12px; color: var(--grigio); }
+.riga-profilo strong { font-weight: 500; font-size: 15px; }
+.riga-profilo .ic { color: var(--grigio); width: 18px; height: 18px; }
+
+/* ---------- Razioni: la scheda settimanale ---------- */
+.cartello { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; padding: 30px 10px; }
+.cartello .mascotte { width: 120px; height: 150px; }
+.cartello-piccolo { flex-direction: row; text-align: left; padding: 4px 4px 4px 0; gap: 8px; font-size: 14px; }
+.cartello-piccolo .mascotte { width: 62px; height: 78px; flex: none; }
+.cartello-piccolo a { color: var(--terra); }
+
+/* striscia dei 7 giorni */
+.settimana { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.giorno-tab { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 7px 0 6px; border-radius: 14px; background: var(--tenue); position: relative; text-align: center; }
+.giorno-tab b { font-family: var(--monumentale); font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+.giorno-tab small { font-size: 10.5px; color: var(--grigio); font-variant-numeric: lining-nums tabular-nums; }
+.giorno-tab.oggi::after { content: ""; position: absolute; bottom: -5px; width: 5px; height: 5px; border-radius: 50%; background: var(--terra); }
+.giorno-tab[aria-selected="true"] { background: var(--inchiostro); color: var(--carta); }
+.giorno-tab[aria-selected="true"] small { color: var(--carta); opacity: .75; }
+.giorno-tab.vuoto small { opacity: .5; }
+
+/* testata del giorno scelto */
+.giorno-testa { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; margin-top: 4px; }
+.giorno-testa h2 { font-family: var(--classico); font-size: 26px; font-weight: 700; line-height: 1; }
+.giorno-testa small { display: block; font-size: 12.5px; color: var(--grigio); margin-top: 3px; }
+.giorno-testa small b { color: var(--oliva); font-weight: 600; }
+.giorno-testa small b.oltre { color: var(--terra); }
+.etichetta { font-family: var(--monumentale); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--terra); vertical-align: middle; }
+.mini-pulsante { display: inline-flex; align-items: center; gap: 5px; border-radius: 99px; padding: 8px 12px; background: var(--tenue);
+  font-family: var(--monumentale); font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.mini-pulsante .ic { width: 14px; height: 14px; }
+
+/* un pasto della scheda */
+.piano-pasto { display: block; width: 100%; background: var(--tenue); border-radius: 20px; padding: 8px 12px 6px 8px; scroll-margin: 80px; }
+.piano-pasto-testa { display: flex; align-items: center; gap: 10px; }
+.piano-pasto-testa strong { flex: 1; font-family: var(--classico); font-size: 18px; font-weight: 700; text-align: left; }
+button.piano-pasto-testa { width: 100%; }
+.piano-pasto-testa > .ic { width: 14px; height: 14px; color: var(--grigio); }
+.piano-voce { display: flex; align-items: baseline; gap: 8px; width: 100%; padding: 6px 0 6px 48px; font-size: 14px; border-top: 1px solid var(--linea); text-align: left; }
+.piano-voce:first-of-type { margin-top: 6px; }
+.piano-voce > span:first-child { flex: 1; min-width: 0; }
+.piano-voce em { font-style: normal; color: var(--grigio); font-size: 12.5px; white-space: nowrap; }
+.piano-voce .kcal { width: 38px; flex: none; text-align: right; font-size: 13px; }
+.piano-aggiungi { display: flex; align-items: center; gap: 6px; padding: 7px 0 4px 48px; color: var(--terra); min-height: 34px;
+  font-family: var(--monumentale); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.piano-aggiungi .ic { width: 15px; height: 15px; }
+.piano-pasto.vuoto { background: transparent; border: 1.5px dashed var(--linea); padding-bottom: 8px; }
+
+/* la settimana a colpo d'occhio */
+.sett-testa { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.sett-testa small { font-size: 12.5px; color: var(--grigio); }
+.formato { display: flex; gap: 2px; background: var(--tenue); border-radius: 99px; padding: 3px; flex: none; }
+.formato button { width: 38px; height: 32px; border-radius: 99px; display: grid; place-items: center; color: var(--grigio); }
+.formato button .ic { width: 17px; height: 17px; }
+.formato button[aria-pressed="true"] { background: var(--inchiostro); color: var(--carta); }
+/* A: tabella 7 giorni × 4 pasti */
+.tabella { display: grid; grid-template-columns: 38px repeat(4, minmax(0, 1fr)); gap: 3px; }
+.tabella .tc { font-family: var(--monumentale); font-size: 9.5px; font-weight: 700; letter-spacing: .05em; color: var(--grigio);
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding-bottom: 2px; }
+.tabella .tc .ic { width: 15px; height: 15px; }
+.tabella .tg { display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 10px; background: var(--tenue); text-align: center; }
+.tabella .tg b { font-family: var(--monumentale); font-size: 10.5px; }
+.tabella .tg small { font-size: 9.5px; color: var(--grigio); font-variant-numeric: lining-nums tabular-nums; }
+.tabella .tg.oggi { background: var(--inchiostro); color: var(--carta); }
+.tabella .tg.oggi small { color: var(--carta); opacity: .75; }
+.cella { background: var(--tenue); border-radius: 10px; padding: 5px 5px 4px; min-height: 66px; display: flex; flex-direction: column; justify-content: space-between; gap: 2px; text-align: left; min-width: 0; }
+.cella span { font-size: 10.5px; line-height: 1.22; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.cella em { font-style: normal; font-size: 10px; color: var(--grigio); font-weight: 600; font-variant-numeric: lining-nums tabular-nums; }
+.cella.vuota { background: transparent; border: 1px dashed var(--linea); align-items: center; justify-content: center; color: var(--grigio); }
+.cella.vuota .ic { width: 14px; height: 14px; }
+/* B: agenda */
+.agenda { display: flex; flex-direction: column; gap: 8px; }
+.ag-giorno { display: block; width: 100%; background: var(--tenue); border-radius: 18px; padding: 8px 12px; }
+.ag-giorno.oggi { box-shadow: inset 0 0 0 1.5px var(--terra); }
+.ag-testa { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 2px; }
+.ag-testa strong { font-family: var(--classico); font-size: 18px; font-weight: 700; }
+.ag-testa small { font-size: 12px; color: var(--grigio); }
+.ag-riga { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; font-size: 12.5px; padding: 3px 0; }
+.ag-testa { width: 100%; text-align: left; }
+.ag-riga .ic { width: 14px; height: 14px; color: var(--grigio); }
+.ag-riga span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ag-riga em { font-style: normal; color: var(--grigio); font-size: 12px; }
+
+/* "Copia su…" */
+.scegli-giorni { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.scegli-giorni .chip { padding: 10px 0; font-size: 11px; }
+.scegli-giorni .chip[aria-pressed="true"] { background: var(--inchiostro); color: var(--carta); }
+
+/* ---------- Provviste di domani ---------- */
+.provviste { background: var(--grano-chiaro); border-radius: 22px; padding: 12px 14px; display: flex; flex-direction: column; gap: 0; }
+.provviste-testa { flex-direction: row; align-items: center; gap: 10px; width: 100%; text-align: left; }
+.provviste-testa .ic-tondo { width: 36px; height: 36px; border-radius: 50%; background: var(--carta); display: grid; place-items: center; color: var(--terra); flex: none; }
+.provviste-testa > span:not(.ic-tondo) { flex: 1; min-width: 0; }
+.provviste-testa strong { display: block; font-family: var(--monumentale); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; }
+.provviste-testa small { display: block; font-size: 12.5px; color: var(--grigio); }
+.compito { display: flex; gap: 10px; align-items: flex-start; width: 100%; padding: 9px 0; text-align: left; border-top: 1px solid rgba(120, 80, 30, .18); }
+.compito:first-child { border-top: 0; }
+.compito > .ic { width: 20px; height: 20px; margin-top: 1px; color: var(--terra); }
+.compito-testo { flex: 1; font-size: 14px; line-height: 1.3; }
+.compito-testo b { font-family: var(--monumentale); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; display: block; color: var(--grigio); }
+.compito-testo small { display: block; font-size: 12px; color: var(--grigio); }
+.spunta { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--grigio); flex: none; display: grid; place-items: center; }
+.spunta.fatta { background: var(--oliva); border-color: var(--oliva); color: var(--carta); }
+.spunta .ic { width: 15px; height: 15px; }
+.compito.fatto .compito-testo { opacity: .5; text-decoration: line-through; }
+.prov-attesa { display: flex; align-items: center; gap: 8px; justify-content: center; padding: 14px 0; }
+.prov-rifai { width: 100%; padding: 4px 0; }
+
+/* ---------- Oggi: pasto previsto dalla scheda ---------- */
+.pasto.previsto { background: transparent; border: 1.5px dashed var(--bronzo); }
+.pasto.previsto .pall { background: var(--grano-chiaro); }
+.pasto-testo strong em { font-style: normal; font-family: var(--leggibile); font-size: 12px; font-weight: 400; color: var(--grigio); }
+.mangiato { display: inline-flex; align-items: center; gap: 4px; border-radius: 99px; padding: 8px 11px; background: var(--oliva); color: var(--carta); flex: none;
+  font-family: var(--monumentale); font-size: 11px; font-weight: 700; letter-spacing: .04em; white-space: nowrap; }
+.mangiato .ic { width: 14px; height: 14px; }
+.voce.tolta { opacity: .45; }
+.voce.tolta strong { text-decoration: line-through; }
+
+/* ---------- Importa la scheda ---------- */
+.sorgenti { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.sorgente { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 4px; border-radius: 18px; background: var(--tenue); cursor: pointer;
+  font-family: var(--monumentale); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.sorgente .ic { width: 26px; height: 26px; color: var(--terra); }
+.letto { display: flex; flex-direction: column; gap: 6px; }
+.letto-giorno { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border-radius: 16px; background: var(--tenue); text-align: left; }
+.letto-giorno b { font-family: var(--monumentale); font-size: 12px; width: 34px; flex: none; }
+.letto-giorno span { flex: 1; min-width: 0; font-size: 12.5px; color: var(--grigio); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.letto-giorno .kcal { flex: none; font-size: 13.5px; color: var(--inchiostro); }
+.imp-pasti { display: flex; flex-direction: column; gap: 6px; }
+.imp-pasti h3 { margin-top: 4px; }
+.area-scheda { width: 100%; border: 1.5px solid var(--linea); background: var(--carta); border-radius: 16px; padding: 12px 14px; font-size: 16px; resize: vertical; }
+.schermata-importa .contenuto { padding-bottom: 0; }
+
+/* ---------- Foglio dal basso e avvisi ---------- */
+.foglio-sfondo { position: fixed; inset: 0; z-index: 30; background: rgba(20, 10, 4, 0); transition: background .25s; display: flex; align-items: flex-end; }
+.foglio-sfondo.aperto { background: rgba(20, 10, 4, .45); }
+.foglio { width: 100%; max-width: 480px; margin: 0 auto; background: var(--carta); border-radius: 26px 26px 0 0;
+  padding: 8px 16px calc(env(safe-area-inset-bottom) + 16px); display: flex; flex-direction: column; gap: 12px;
+  max-height: 88dvh; overflow-y: auto; transform: translateY(100%); transition: transform .25s ease-out; }
+.aperto .foglio { transform: none; }
+.foglio-maniglia { width: 40px; height: 5px; border-radius: 3px; background: var(--linea); margin: 0 auto 2px; }
+.foglio-testa { display: flex; align-items: center; justify-content: space-between; }
+.avviso { position: fixed; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 90px); z-index: 40; max-width: 440px; margin: 0 auto;
+  background: var(--inchiostro); color: var(--carta); border-radius: 16px; padding: 12px 16px; font-size: 14px; text-align: center;
+  opacity: 0; transform: translateY(10px); transition: opacity .25s, transform .25s; pointer-events: none; }
+.avviso.visibile { opacity: 1; transform: none; }
+.avviso.in-alto { bottom: auto; top: calc(env(safe-area-inset-top) + 10px); transform: translateY(-10px); }
+.avviso.in-alto.visibile { transform: none; }
+.avviso.errore { background: var(--errore); color: #fff; }
+
+/* ---------- Dosatore (grammi o pezzi) ---------- */
+.quantita { background: var(--tenue); border-radius: 99px; padding: 6px 12px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.dos-nome { font-family: var(--classico); font-size: 22px; font-weight: 700; line-height: 1.1; padding-right: 8px; }
+.dos-modi button { font-size: 12px; }
+.dos-schermo { text-align: center; padding: 4px 0; }
+.dos-quantita { font-family: var(--classico); font-weight: 700; font-size: 46px; line-height: 1; }
+.dos-quantita span { font-family: var(--leggibile); font-size: 18px; margin-left: 3px; }
+.dos-kcal { font-size: 15px; font-weight: 600; margin-top: 6px; }
+.dos-kcal small { display: block; font-weight: 400; font-size: 12px; color: var(--grigio); margin-top: 2px; }
+.dos-passi { display: flex; justify-content: center; gap: 28px; }
+.dos-tondo { width: 76px; height: 76px; border-radius: 50%; background: var(--tenue); font-family: var(--classico); font-size: 42px; font-weight: 700; line-height: 1;
+  display: grid; place-items: center; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+.dos-tondo[data-azione="piu"] { background: var(--terra); color: var(--su-terra); }
+.tastierino { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tastierino button { display: grid; place-items: center; height: 52px; border-radius: 16px; background: var(--tenue); font-family: var(--classico); font-size: 26px; font-weight: 700;
+  touch-action: manipulation; -webkit-user-select: none; user-select: none; }
+.tastierino [data-tasto="C"], .tastierino [data-tasto="⌫"] { font-family: var(--leggibile); font-size: 20px; color: var(--grigio); }
+.dos-rimuovi { display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--errore); font-size: 14px; padding: 4px; }
+.dos-rimuovi .ic { width: 16px; height: 16px; }
+
+/* ---------- Foto del piatto e codice a barre (tappa 3) ---------- */
+/* i tasti Foto e Codice ai lati del microfono */
+.grande-tondo { background: var(--carta); color: var(--terra); }
+.grande-tondo small { font-family: var(--monumentale); font-weight: 700; letter-spacing: .04em; font-size: 9.5px; }
+
+/* la foto mentre il legionario la guarda */
+.foto-piatto { position: relative; width: 100%; height: 150px; border-radius: 18px; overflow: hidden; background: var(--tenue); }
+.foto-piatto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.foto-piatto .foto-stato { position: absolute; left: 10px; right: 10px; bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: rgba(31, 24, 20, .78); color: #FFF6E8; border-radius: 99px; padding: 8px 12px; font-size: 13.5px; }
+.voce-nome small .ic { width: 12px; height: 12px; vertical-align: -1px; }
+
+/* il mirino dello scanner */
+.cod-corpo { display: flex; flex-direction: column; gap: 12px; }
+.mirino { position: relative; height: 250px; border-radius: 22px; overflow: hidden; background: #0d0a08; }
+.mirino video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.mirino .cornice { position: absolute; left: 10%; right: 10%; top: 30%; bottom: 30%; border-radius: 14px; box-shadow: 0 0 0 999px rgba(13, 10, 8, .45); }
+.mirino .cornice::before { content: ""; position: absolute; inset: -3px; border: 3px solid var(--grano); border-radius: 16px;
+  -webkit-mask: linear-gradient(#000 0 0) top left / 26px 26px no-repeat, linear-gradient(#000 0 0) top right / 26px 26px no-repeat,
+                linear-gradient(#000 0 0) bottom left / 26px 26px no-repeat, linear-gradient(#000 0 0) bottom right / 26px 26px no-repeat;
+          mask: linear-gradient(#000 0 0) top left / 26px 26px no-repeat, linear-gradient(#000 0 0) top right / 26px 26px no-repeat,
+                linear-gradient(#000 0 0) bottom left / 26px 26px no-repeat, linear-gradient(#000 0 0) bottom right / 26px 26px no-repeat; }
+.mirino .laser { position: absolute; left: 6%; right: 6%; top: 50%; height: 2px; background: var(--terra); box-shadow: 0 0 10px var(--terra);
+  animation: laser 1.6s ease-in-out infinite alternate; }
+@keyframes laser { from { transform: translateY(-34px); } to { transform: translateY(34px); } }
+.mirino .mirino-testo { position: absolute; left: 12px; right: 12px; bottom: 12px; text-align: center; color: #FFF6E8; font-size: 13.5px; }
+.mirino.spento .laser, .mirino.spento .cornice { display: none; }
+.mirino.spento .mirino-testo { top: 0; bottom: 0; display: grid; place-items: center; }
+.codice-a-mano { display: flex; gap: 8px; }
+.codice-a-mano input { flex: 1; min-width: 0; border: 1.5px solid var(--linea); background: var(--carta); border-radius: 99px; padding: 11px 16px;
+  font-size: 17px; letter-spacing: .08em; }
+.codice-a-mano input:focus { outline: none; border-color: var(--terra); }
+.codice-a-mano .pillola { padding-left: 18px; padding-right: 18px; }
+.cod-attesa { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 40px 0; }
+.strade { display: flex; flex-direction: column; gap: 6px; }
+
+/* sotto il nome nel dosatore: da dove vengono i dati */
+.dos-fonte { font-size: 12.5px; color: var(--grigio); margin-top: -8px; }
+
+/* ---------- Macronutrienti (Io) ---------- */
+.mac-corpo { display: flex; flex-direction: column; gap: 10px; }
+.ripartizione { display: flex; height: 14px; border-radius: 99px; overflow: hidden; gap: 2px; }
+.ripartizione i { display: block; height: 100%; transition: width .3s; }
+.mac-righe { display: flex; flex-direction: column; gap: 8px; }
+.mac-riga { display: grid; grid-template-columns: 14px 1fr auto auto auto; align-items: center; gap: 10px; background: var(--tenue); border-radius: 18px; padding: 8px 10px 8px 12px; }
+.mac-riga .pallino { width: 12px; height: 12px; border-radius: 50%; }
+.mac-riga strong { font-family: var(--classico); font-size: 18px; font-weight: 700; line-height: 1.1; }
+.mac-riga strong small { display: block; font-family: var(--leggibile); font-size: 12px; font-weight: 400; color: var(--grigio); }
+.mac-riga .perc { font-family: var(--classico); font-size: 24px; font-weight: 700; min-width: 50px; text-align: center; }
+.mac-riga .mini { width: 38px; height: 38px; border-radius: 50%; background: var(--carta); font-family: var(--classico); font-size: 24px; font-weight: 700; display: grid; place-items: center; }
+.mac-riga.resto { background: transparent; border: 1.5px dashed var(--linea); }
+.mac-riga.resto .perc { color: var(--grigio); }
+.proposta { background: var(--grano-chiaro); border-radius: 20px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.proposta p { font-size: 13.5px; line-height: 1.35; }
+.proposta .sopra { display: flex; align-items: center; gap: 6px; }
+.proposta .sopra .ic { width: 14px; height: 14px; color: var(--terra); }
+.mac-proposta:empty { display: none; }
+.area-dieta { width: 100%; border: 1.5px solid var(--linea); background: var(--carta); border-radius: 16px; padding: 12px 14px;
+  font-family: var(--classico); font-style: italic; font-size: 17px; line-height: 1.3; resize: none; min-height: 84px; overflow-wrap: break-word; }
+.area-dieta:focus { outline: none; border-color: var(--terra); }
+.centro-tasti { justify-content: center; }
+
+/* ---------- Il guardiano del metabolismo ---------- */
+.guardiano { background: var(--tenue); border: 1.5px solid var(--bronzo); border-radius: 22px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.guardiano-testa { display: flex; align-items: center; gap: 10px; }
+.guardiano-testa .ic-tondo { width: 36px; height: 36px; border-radius: 50%; background: var(--grano-chiaro); display: grid; place-items: center; color: var(--bronzo); flex: none; }
+.guardiano-testa > span:not(.ic-tondo) { flex: 1; }
+.guardiano-testa strong { display: block; font-family: var(--monumentale); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; }
+.guardiano-testa small { display: block; font-size: 12.5px; color: var(--grigio); }
+.guardiano p { font-size: 13.5px; line-height: 1.35; }
+.guardiano .azioni { display: flex; gap: 8px; }
+.guardiano .azioni .pillola { flex: 1; padding: 10px 8px; font-size: 12px; }
+.non-ora { align-self: center; font-size: 12.5px; color: var(--grigio); text-decoration: underline; text-underline-offset: 3px; padding: 2px 6px; }
+
+/* il blocco Razioni durante la pausa */
+.razioni-oggi.in-pausa { box-shadow: inset 0 0 0 1.5px var(--oliva); }
+.pausa-etichetta { display: flex; align-items: center; gap: 6px; font-family: var(--monumentale); font-size: 10.5px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--oliva); }
+.pausa-etichetta .ic { width: 15px; height: 15px; }
+.pausa-passi { display: flex; gap: 3px; margin-top: -4px; }
+.pausa-passi i { flex: 1; height: 4px; border-radius: 2px; background: var(--linea); }
+.pausa-passi i.fatto { background: var(--oliva); }
+.razioni-oggi.in-pausa .ro-barra i { background: linear-gradient(90deg, var(--oliva), var(--grano)); }
+
+/* pausa e percorso (fogli) */
+.scelta-giorni { display: flex; gap: 6px; }
+.scelta-giorni .chip[aria-pressed="true"] { background: var(--inchiostro); color: var(--carta); }
+.dati-percorso { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.dati-percorso div { background: var(--tenue); border-radius: 14px; padding: 7px 10px; font-size: 13px; }
+.dati-percorso small { display: block; font-size: 11px; color: var(--grigio); }
+.dati-percorso strong { font-family: var(--classico); font-size: 20px; }
+.percorso-giudizio { display: flex; flex-direction: column; gap: 10px; }
+.verdetto { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; border-radius: 99px; padding: 6px 12px;
+  font-family: var(--monumentale); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.verdetto .ic { width: 14px; height: 14px; }
+.verdetto.stallo { background: var(--grano-chiaro); color: var(--terra); }
+.verdetto.regolare { background: var(--oliva); color: var(--carta); }
+.verdetto.presto { background: var(--tenue); color: var(--grigio); }
+.consiglio { font-size: 14px; line-height: 1.4; }
+
+/* ---------- Movimento di ogni giorno (Io) ---------- */
+.mov-corpo { display: flex; flex-direction: column; gap: 12px; }
+.livelli { display: flex; flex-direction: column; gap: 6px; }
+.livello { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; text-align: left; border: 1.5px solid var(--linea); border-radius: 16px; padding: 10px 12px; background: var(--carta); }
+.livello b { font-family: var(--classico); font-size: 19px; line-height: 1.1; }
+.livello em { font-style: normal; font-size: 13px; font-weight: 600; color: var(--grigio); align-self: center; }
+.livello small { grid-column: 1 / -1; color: var(--grigio); font-size: 12.5px; line-height: 1.3; }
+.livello[aria-pressed="true"] { border-color: var(--terra); background: var(--grano-chiaro); }
+.livello .consigliato { grid-column: 1 / -1; display: flex; align-items: center; gap: 4px; margin-top: 4px; font-family: var(--monumentale); font-size: 9.5px;
+  font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--oliva); }
+.livello .consigliato .ic { width: 12px; height: 12px; }
+.aiuto-livello { display: flex; align-items: center; gap: 10px; background: var(--tenue); border-radius: 16px; padding: 10px 12px; text-align: left; }
+.aiuto-livello .ic { color: var(--terra); }
+.aiuto-livello span { flex: 1; font-size: 13.5px; line-height: 1.3; }
+.aiuto-livello b { display: block; font-family: var(--monumentale); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; }
+.passi-domande { display: flex; gap: 4px; }
+.passi-domande i { flex: 1; height: 4px; border-radius: 2px; background: var(--linea); }
+.passi-domande i.fatto { background: var(--terra); }
+.domanda { font-family: var(--classico); font-size: 22px; font-weight: 700; line-height: 1.15; }
+.risposte { display: flex; flex-direction: column; gap: 6px; }
+.risposta-guida { display: flex; gap: 10px; align-items: flex-start; text-align: left; border: 1.5px solid var(--linea); border-radius: 16px; padding: 10px 12px; background: var(--carta); }
+.risposta-guida .emoji { font-size: 20px; line-height: 1.2; }
+.risposta-guida span { display: flex; flex-direction: column; gap: 1px; }
+.risposta-guida strong { font-size: 14.5px; font-weight: 600; }
+.risposta-guida small { color: var(--grigio); font-size: 12.5px; line-height: 1.3; }
+.risposta-guida[aria-pressed="true"] { border-color: var(--terra); background: var(--grano-chiaro); }
+.come-salute { background: var(--tenue); border-radius: 16px; padding: 10px 12px; font-size: 13px; line-height: 1.4; }
+.come-salute ol { padding-left: 18px; margin-top: 4px; }
+.salta { align-self: center; font-size: 12.5px; color: var(--grigio); text-decoration: underline; text-underline-offset: 3px; }
+.esito { background: var(--grano-chiaro); border-radius: 20px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+.esito .sopra { color: var(--oliva); }
+.esito strong.nome { font-family: var(--classico); font-size: 30px; line-height: 1; }
+.esito p { font-size: 13.5px; line-height: 1.35; }
+.conto-livello { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; background: var(--tenue); border-radius: 14px; padding: 8px 12px; font-size: 13px; }
+.conto-livello b { font-family: var(--classico); font-size: 22px; white-space: nowrap; }
+
+/* ---------- Pasti previsti: ✓ / ✗ e «non mangiato» ---------- */
+.pasto-tocco { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; text-align: left; }
+.si-no { display: flex; gap: 8px; flex: none; }
+.tondo-si, .tondo-no { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; }
+.tondo-si { background: var(--oliva); color: var(--carta); }
+.tondo-no { background: var(--carta); color: var(--errore); box-shadow: inset 0 0 0 1.5px var(--errore); }
+.tondo-si .ic, .tondo-no .ic { width: 20px; height: 20px; }
+.pasto.saltato { background: transparent; border: 1.5px dashed var(--linea); }
+.pasto.saltato .pasto-testo small { color: var(--errore); }
+.ripristina { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--tenue); color: var(--grigio); flex: none; }
+.ripristina .ic { width: 18px; height: 18px; }
+
+/* ---------- Modifica di un pasto (scheda o previsto) ---------- */
+.dalla-scheda { display: flex; align-items: center; gap: 8px; background: var(--grano-chiaro); border-radius: 14px; padding: 8px 12px; font-size: 13px; }
+.dalla-scheda .ic { width: 16px; height: 16px; color: var(--terra); flex: none; }
+.svuota { display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--errore); font-size: 14px; padding: 4px; }
+.svuota .ic { width: 16px; height: 16px; }
+.cambi { font-size: 13px; line-height: 1.5; background: var(--tenue); border-radius: 14px; padding: 8px 12px; }
+.campo-nome input { font-family: var(--classico); font-size: 20px; font-weight: 700; }
+
+/* ---------- Nome del pasto della scheda ---------- */
+.nome-pasto-riga { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: var(--grano-chiaro); border-radius: 16px; padding: 9px 12px; }
+.nome-pasto-riga .ic { width: 16px; height: 16px; color: var(--terra); flex: none; }
+.nome-pasto-riga span { display: flex; flex-direction: column; min-width: 0; }
+.nome-pasto-riga small { font-size: 11.5px; color: var(--grigio); }
+.nome-pasto-riga strong { font-family: var(--classico); font-size: 19px; font-weight: 700; line-height: 1.15; }
+.ag-riga.con-nome span { font-weight: 600; }
+/* casella con il nome del pasto: nome al centro esatto del quadrato, kcal in basso al centro */
+.cella.con-nome { position: relative; justify-content: center; align-items: center; text-align: center; padding-bottom: 16px; padding-top: 16px; }
+.cella.con-nome span { font-weight: 600; font-size: 11.5px; }
+.cella.con-nome em { position: absolute; left: 0; right: 0; bottom: 4px; text-align: center; }
+.nome-sotto { display: block; font-family: var(--leggibile); font-size: 12.5px; font-weight: 400; color: var(--grigio); line-height: 1.2; }
+.copia-pasto { align-self: flex-start; }
+
+/* ---------- Peso: l'obiettivo con il righello (una tacca per kg) ---------- */
+.peso-card.con-meta { flex-wrap: wrap; }
+.meta { flex-basis: 100%; order: 3; display: flex; flex-direction: column; gap: 6px; padding: 12px 8px 0 0; margin-top: 4px;
+  border-top: 1px solid rgba(120, 80, 30, .18); }
+.meta-testa { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.meta-testa > span { display: flex; align-items: baseline; gap: 4px; }
+.meta-testa small { font-family: var(--monumentale); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--grigio); }
+.meta-testa b { font-family: var(--classico); font-size: 22px; font-weight: 700; line-height: 1; }
+.meta-testa em { font-style: normal; font-size: 13px; font-weight: 600; color: var(--oliva); white-space: nowrap; }
+.righello { position: relative; height: 18px; border-radius: 9px; background: var(--linea); overflow: hidden; }
+.righello .pieno { position: absolute; inset: 0 auto 0 0; background: var(--oliva); border-radius: 9px; transition: width .5s; }
+.righello i { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--grano-chiaro); }
+.scala { position: relative; height: 16px; font-size: 11px; color: var(--grigio); font-variant-numeric: lining-nums tabular-nums; }
+.scala span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.scala .inizio { transform: none; }
+.scala .fine { transform: translateX(-100%); }
+.scala .qui { color: var(--inchiostro); font-weight: 700; }
+
+/* Io: la ripartizione dei macro in una barretta colorata sotto le percentuali */
+.mini-ripartizione { display: flex; gap: 2px; height: 5px; border-radius: 3px; overflow: hidden; margin-top: 6px; }
+.mini-ripartizione b { display: block; height: 100%; }
+
+/* Oggi: per il giorno in corso, al posto dell'interruttore, una nota */
+.conta-oggi { font-size: 12.5px; color: var(--grigio); padding: 0 4px; }
+
+/* Razioni: la scheda del giorno è lontana dal piano */
+.lontano-piano { margin-top: -2px; }
+
+/* ---------- Giorni che contano nella previsione ---------- */
+.conta-giorno { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 2px 4px; }
+.conta-giorno > span { flex: 1; font-size: 13px; color: var(--grigio); line-height: 1.25; }
+.conta-giorno > span b { display: block; font-size: 14px; font-weight: 600; color: var(--inchiostro); }
+.conta-giorno.spento > span b { color: var(--grigio); }
+.interruttore { width: 46px; height: 28px; border-radius: 99px; background: var(--linea); position: relative; flex: none; transition: background .2s; }
+.interruttore::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--carta);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .25); transition: transform .2s; }
+[aria-checked="true"] > .interruttore { background: var(--oliva); }
+[aria-checked="true"] > .interruttore::after { transform: translateX(18px); }
+.giorni-da-contare { display: flex; flex-direction: column; gap: 6px; }
+.giorno-conta { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: var(--tenue); border-radius: 16px; padding: 9px 12px; }
+.giorno-conta > span { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.giorno-conta strong { font-family: var(--classico); font-size: 18px; font-weight: 700; line-height: 1.1; }
+.giorno-conta small { font-size: 12.5px; color: var(--grigio); }
+.giorno-conta small.forse { color: var(--terra); }
+
+/* Oggi → «Copia in un altro pasto»: alimenti da spuntare, giorno e pasto di arrivo */
+.voce.da-copiare { width: 100%; text-align: left; }
+.spunta-tonda { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--linea); display: grid; place-items: center; color: transparent; }
+.spunta-tonda .ic { width: 14px; height: 14px; }
+.scelta-si .spunta-tonda { background: var(--oliva); border-color: var(--oliva); color: var(--carta); }
+.copia-incolla { display: flex; flex-wrap: wrap; gap: 6px; }
+.scelta-pasti { display: flex; flex-direction: column; gap: 8px; }
+.appunti { display: flex; align-items: center; gap: 4px; margin-bottom: 8px; padding: 6px 4px 6px 12px; border-radius: 20px;
+  background: var(--grano-chiaro); border: 1.5px dashed var(--bronzo); }
+.appunti-tocco { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; text-align: left; }
+.appunti-tocco > .ic { width: 18px; height: 18px; color: var(--terra); flex: none; }
+.appunti-tocco span { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.appunti-tocco b { font-family: var(--classico); font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.appunti-tocco small { font-size: 12px; color: var(--grigio); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.appunti-tocco em { font-style: normal; font-family: var(--monumentale); font-size: 10.5px; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--su-terra); background: var(--terra); border-radius: 99px; padding: 7px 11px; }
+
+/* Aggiungi: interruttore «Spesso a cena / Di recente» sotto la ricerca */
+.segmenti.piccoli { margin: 4px 0 2px; }
+.segmenti.piccoli button { padding: 7px 0; font-size: 11px; }
+.segmenti.piccoli button .ic { width: 13px; height: 13px; }
+.segmenti.piccoli button:disabled { opacity: .45; }
+.risultato .volte { color: var(--oliva); font-weight: 600; }
+
+/* ---------- Aggiungi → Attività (A1): tipo, minuti, intensità 1-5, orologio, risultato ---------- */
+.etichetta-campo { font-family: var(--monumentale); font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--grigio); margin-bottom: -4px; }
+.tipi { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.nota-tipo { font-size: 12.5px; color: var(--grigio); line-height: 1.35; background: var(--tenue); border-radius: 14px; padding: 8px 12px; }
+.tipo { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 2px; border-radius: 14px; background: var(--tenue); font-size: 11.5px; font-weight: 600; }
+.tipo .e { font-size: 20px; line-height: 1.1; }
+.tipo[aria-pressed="true"] { background: var(--inchiostro); color: var(--carta); }
+.minuti-rapidi { display: flex; gap: 6px; }
+.minuti-rapidi .chip { padding: 9px 0; }
+.minuti-rapidi .chip[aria-pressed="true"] { background: var(--inchiostro); color: var(--carta); }
+.minuti-mano { width: 64px; flex: none; border: 1.5px solid var(--linea); border-radius: 99px; background: var(--carta); text-align: center;
+  font: 600 14px var(--leggibile); font-variant-numeric: lining-nums; color: var(--inchiostro); padding: 0 6px; }
+.minuti-mano:focus { outline: none; border-color: var(--terra); }
+.zone { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.zona { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0 6px; border-radius: 12px; background: var(--tenue);
+  font-family: var(--classico); font-size: 20px; font-weight: 700; line-height: 1; font-variant-numeric: lining-nums; }
+.zona small { font-family: var(--leggibile); font-size: 9.5px; font-weight: 400; color: var(--grigio); }
+.zona i { width: 22px; height: 4px; border-radius: 2px; }
+.z1 i { background: #8FA9B8; } .z2 i { background: #7E9B4E; } .z3 i { background: #D99A2B; } .z4 i { background: #C9713A; } .z5 i { background: #A8392A; }
+.zona[aria-pressed="true"] { background: var(--inchiostro); color: var(--carta); }
+.zona[aria-pressed="true"] small { color: var(--carta); opacity: .8; }
+.spiega-zona { display: flex; gap: 10px; align-items: center; background: var(--grano-chiaro); border-radius: 14px; padding: 9px 12px; }
+.spiega-zona .e { font-size: 22px; }
+.spiega-zona > span:last-child { display: flex; flex-direction: column; font-size: 13px; line-height: 1.3; }
+.spiega-zona b { font-family: var(--classico); font-size: 17px; }
+.orologio { border: 1.5px dashed var(--linea); border-radius: 18px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+.orologio .testa { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 13.5px; font-weight: 600; }
+.orologio .testa span { display: flex; align-items: center; gap: 5px; }
+.orologio .testa .ic { width: 14px; height: 14px; color: var(--terra); }
+.orologio .testa small { font-weight: 400; color: var(--grigio); font-size: 11.5px; text-align: right; }
+.campi-tre { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px; }
+.campi-tre .campo input { padding: 10px 6px; text-align: center; }
+.campi-tre .campo > span { font-size: 11.5px; text-align: center; }
+.esito-att { background: var(--grano-chiaro); border-radius: 20px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.esito-att .riga1 { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.esito-att strong { font-family: var(--classico); font-size: 34px; line-height: 1; font-variant-numeric: lining-nums; }
+.esito-att strong span { font-size: 15px; margin-left: 4px; }
+.esito-att .fonte { font-family: var(--monumentale); font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--oliva); font-weight: 700; text-align: right; }
+.esito-att p { font-size: 12.5px; color: var(--grigio); line-height: 1.35; }
