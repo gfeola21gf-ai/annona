@@ -1,0 +1,17 @@
+{
+  "name": "Annona",
+  "short_name": "Annona",
+  "description": "Razioni sagge, giorno dopo giorno: calorie, deficit, peso e motivazione.",
+  "lang": "it",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFBF3",
+  "theme_color": "#FFFBF3",
+  "icons": [
+    { "src": "icone/icona-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icone/icona-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icone/icona-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

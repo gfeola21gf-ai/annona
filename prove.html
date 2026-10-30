@@ -1,0 +1,126 @@
+<!doctype html>
+<!-- prove.html — controlla da sola i calcoli di logica/energia.js e logica/attivita.js.
+     Apri http://localhost:8000/prove.html : ogni riga deve essere verde. -->
+<html lang="it"><head><meta charset="utf-8"><title>Prove calcoli</title>
+<style>body{font:15px system-ui;padding:16px}li{margin:4px 0}.ok{color:#2e7d32}.no{color:#c62828;font-weight:700}</style></head>
+<body><h1>Prove dei calcoli</h1><ul id="esiti"></ul><p id="totale"></p>
+<script type="module">
+import * as E from "./logica/energia.js";
+import * as G from "./logica/giorni.js";
+import * as U from "./ui.js";
+import * as A from "./logica/attivita.js";
+import * as C from "./servizi/cibo.js";
+const ul = document.getElementById("esiti"); let falliti = 0;
+const prova = (nome, avuto, atteso) => {
+  const ok = JSON.stringify(avuto) === JSON.stringify(atteso);
+  if (!ok) falliti++;
+  ul.insertAdjacentHTML("beforeend", `<li class="${ok ? "ok" : "no"}">${ok ? "✓" : "✗"} ${nome}: ${JSON.stringify(avuto)}${ok ? "" : " (atteso " + JSON.stringify(atteso) + ")"}</li>`);
+};
+prova("Basale uomo 80 kg, 180 cm, 30 anni", E.basale({ sesso: "M", eta: 30, altezza: 180, peso: 80 }), 1780);
+prova("Numero: punto delle migliaia anche a 4 cifre", [U.numero(1824), U.numero(12345), U.numero(-2374), U.numero(0.44, 2), U.kg(77)], ["1.824", "12.345", "−2.374", "0,44", "77,0"]);
+prova("Lettura: 1.780 / 78,4 / 78.4 / 1.780,5", [U.leggiNumero("1.780"), U.leggiNumero("78,4"), U.leggiNumero("78.4"), U.leggiNumero("1.780,5")], [1780, 78.4, 78.4, 1780.5]);
+prova("Basale donna 60 kg, 165 cm, 40 anni", E.basale({ sesso: "F", eta: 40, altezza: 165, peso: 60 }), 1270);
+const b = E.bilancioGiorno({ basaleKcal: 1780, pasti: [{ kcal: 1500 }, { kcal: 500 }], attivita: [{ kcal: 400 }], obiettivoKcal: -550 });
+prova("Fabbisogno = basale + attività", b.fabbisogno, 2180);
+prova("Fabbisogno = basale × 1,3 + attività", E.bilancioGiorno({ basaleKcal: 1780, pasti: [], attivita: [{ kcal: 400 }], fattore: 1.3 }).fabbisogno, 2714);
+prova("Domande guida: ufficio, auto, faccende → basso", E.LIVELLI[E.livelloDalleRisposte({ lavoro: 1, spostamenti: 0, casa: 1 })].id, "basso");
+prova("Domande guida + 7-10 mila passi → medio", E.LIVELLI[E.livelloDalleRisposte({ lavoro: 1, spostamenti: 0, casa: 1, passi: 2 })].id, "medio");
+prova("Domande guida: lavoro pesante + tanti passi → molto alto", E.LIVELLI[E.livelloDalleRisposte({ lavoro: 3, spostamenti: 1, casa: 1, passi: 3 })].id, "molto-alto");
+prova("Taratura: fattore 1,37 → medio", E.livelloVicino(1.37).id, "medio");
+prova("Bilancio (2000 mangiate) = deficit 180", b.bilancio, -180);
+prova("Da mangiare per l'obiettivo −550", b.daMangiare, 1630);
+prova("Restano (negativo = oltre il piano)", b.restano, -370);
+prova("Ritmo −0,5 kg/sett → kcal al giorno", E.kcalGiornalierePerRitmo(-0.5), -550);
+// Regole dei nutrizionisti: minimo 1.200 F / 1.500 M, ritmo in % del peso
+prova("Minimo donna / uomo", [E.minimoKcal("F"), E.minimoKcal("M")], [1200, 1500]);
+prova("Piano: 1.500 − 550 = 950 → alzato al minimo 1.200", E.pianoDelGiorno(1500, -550, 1200), 1200);
+prova("Piano: sopra il minimo resta com'è", E.pianoDelGiorno(2300, -550, 1500), 1750);
+prova("Piano: fabbisogno sotto il minimo → niente deficit", E.pianoDelGiorno(1100, -300, 1200), 1100);
+prova("Piano: per aumentare il minimo non conta", E.pianoDelGiorno(2000, 300, 1500), 2300);
+prova("Ritmo vero col minimo (1.500, −0,5, 1.200) ≈ −0,27", Math.round(E.ritmoEffettivo(1500, -0.5, 1200) * 100) / 100, -0.27);
+prova("Bollino a fasce (voluto −550): −560 / −700 / −850 / −300 / +100", [E.statoBilancio(-560, -550), E.statoBilancio(-700, -550), E.statoBilancio(-850, -550), E.statoBilancio(-300, -550), E.statoBilancio(100, -550)], ["verde", "giallo", "rosso", "giallo", "rosso"]);
+prova("Bollino: ai bordi delle fasce (±100 verde, ±250 giallo)", [E.statoBilancio(-450, -550), E.statoBilancio(-650, -550), E.statoBilancio(-301, -550), E.statoBilancio(-801, -550)], ["verde", "verde", "giallo", "rosso"]);
+prova("Bollino aumentando (+300) e mantenendo (0)", [E.statoBilancio(320, 300), E.statoBilancio(160, 300), E.statoBilancio(-100, 300), E.statoBilancio(90, 0), E.statoBilancio(-250, 0), E.statoBilancio(400, 0)], ["verde", "giallo", "rosso", "verde", "giallo", "rosso"]);
+prova("Ritmi per 62 kg: −0,2 / −0,3 / −0,45", E.ritmiPerPeso(62).map((r) => Math.round(r.v * 100) / 100), [-0.2, -0.3, -0.45]);
+prova("Ritmi per 100 kg: −0,3 / −0,5 / −0,75", E.ritmiPerPeso(100).map((r) => Math.round(r.v * 100) / 100), [-0.3, -0.5, -0.75]);
+prova("Bilancio col minimo: daMangiare 1.200", E.bilancioGiorno({ basaleKcal: 1154, pasti: [], attivita: [], obiettivoKcal: -550, fattore: 1.3, minimoKcal: 1200 }).daMangiare, 1200);
+prova("−550 kcal/giorno → kg a settimana", Math.round(E.kgSettimanaDa(-550) * 100) / 100, -0.5);
+const giorni = [
+  { giorno: "2026-10-07", bilancio: -9999 },   // fuori finestra (8 giorni fa)
+  { giorno: "2026-10-12", bilancio: -400 },
+  { giorno: "2026-10-14", bilancio: -600 },
+  { giorno: "2026-10-15", bilancio: -2000 },   // oggi: escluso
+];
+const pr = E.previsione(giorni, "2026-10-15");
+prova("Previsione: media dei giorni completi", pr.mediaKcal, -500);
+prova("Previsione: giorni usati", pr.giorniUsati, 2);
+prova("Previsione senza dati", E.previsione([], "2026-10-15"), null);
+const mm = E.mediaMobile([
+  { quando: "2026-10-01T07:00:00", kg: 80 }, { quando: "2026-10-03T07:00:00", kg: 79 },
+  { quando: "2026-10-07T07:00:00", kg: 78 }, { quando: "2026-10-09T07:00:00", kg: 77 },
+]).map((p) => Math.round(p.media * 100) / 100);
+prova("Media mobile 7 giorni", mm, [80, 79.5, 79, 78]);
+prova("Settimane all'obiettivo (80→74 a −0,5)", E.settimaneAllObiettivo(80, 74, -0.5), 12);
+prova("Avanzamento 80→78 verso 74", Math.round(E.avanzamento(80, 78, 74) * 100), 33);
+prova("Giorno prima", G.aggiungiGiorni("2026-03-01", -1), "2026-02-28");
+prova("Età", G.etaDa("1990-10-16", new Date(2026, 9, 15)), 35);
+prova("Grammi: 360 kcal/100g × 90 g", E.perGrammi(360, 90), 324);
+{ // stallo: 21 giorni a −500 kcal, ma il peso scende solo di 1 etto
+  const giorni = Array.from({ length: 21 }, (_, i) => ({ giorno: G.aggiungiGiorni("2026-10-16", -21 + i), mangiato: 1300, bilancio: -500 }));
+  const pesate = ["2026-09-25", "2026-09-27", "2026-10-10", "2026-10-13"].map((g, i) => ({ quando: `${g}T07:00:00`, kg: i < 2 ? 80 : 79.9 }));
+  const s = E.valutaStallo(giorni, pesate, "2026-10-16");
+  prova("Stallo: atteso / reale", `${s.atteso} / ${s.reale}`, "-0.9 / -0.1");
+  prova("Stallo riconosciuto", s.stallo, true);
+  prova("Fabbisogno reale stimato", s.fabbisognoReale, 1355);
+  prova("Stallo: pochi giorni registrati → null", E.valutaStallo(giorni.slice(0, 10), pesate, "2026-10-16"), null);
+  const pesateGiu = pesate.map((p, i) => ({ ...p, kg: i < 2 ? 80 : 79.2 }));
+  prova("Nessuno stallo se il peso scende", E.valutaStallo(giorni, pesateGiu, "2026-10-16").stallo, false);
+}
+prova("Macro: carboidrati = il resto", JSON.stringify(E.ripartizione({ p: 40, g: 25 })), JSON.stringify({ c: 35, p: 40, g: 25 }));
+prova("Macro: passi di 5 e minimo 5% ai carboidrati", JSON.stringify(E.ripartizione({ p: 62, g: 41 })), JSON.stringify({ c: 5, p: 60, g: 35 }));
+// MACRO DEL NUTRIZIONISTA (2026-10-30): le tre persone dell'anteprima/macro-nutrizionista.html
+prova("Peso di riferimento: 80 kg 180 cm → 80 · 106 kg 170 cm → 80,7", [E.pesoRiferimento(80, 180), E.pesoRiferimento(106, 170)], [80, 80.7]);
+prova("Allenamento: niente / cardio / pesi / entrambi", [E.tipoAllenamento(undefined), E.tipoAllenamento(["cardio"]), E.tipoAllenamento(["pesi"]), E.tipoAllenamento(["pesi", "cardio"])], ["nessuno", "cardio", "pesi", "entrambi"]);
+const val = E.macroNutrizionista({ kcal: 2930, peso: 80, altezza: 180, eta: 23, allenamento: ["pesi"], ritmo: 0.5 });
+prova("Valerio 80 kg, pesi, aumentare, 2.930 kcal → P 144 · G 98 · C 369", [val.grammi, val.perKg], [{ c: 369, p: 144, g: 98 }, 1.8]);
+const sig = E.macroNutrizionista({ kcal: 1400, peso: 62, altezza: 165, eta: 50, allenamento: [], ritmo: -0.3 });
+prova("Signora 62 kg, niente sport, dimagrire, 1.400 kcal → P 74 · G 47 · C 171", sig.grammi, { c: 171, p: 74, g: 47 });
+const rag = E.macroNutrizionista({ kcal: 2200, peso: 106, altezza: 170, eta: 21, allenamento: ["pesi"], ritmo: -0.8 });
+prova("Ragazzo 106 kg 1,70 m, pesi, dimagrire → P 161 (sul peso di riferimento)", [rag.grammi.p, rag.pesoRif], [161, 80.7]);
+prova("Cardio + pesi, mantenere → 1,7 g/kg", E.proteinePerKg({ allenamento: ["cardio", "pesi"], ritmo: 0 }), 1.7);
+prova("Dai 65 anni almeno 1,2 g/kg", E.proteinePerKg({ allenamento: [], ritmo: 0, eta: 70 }), 1.2);
+const poco = E.macroNutrizionista({ kcal: 1200, peso: 55, altezza: 160, eta: 40, allenamento: ["pesi"], ritmo: -0.3 });
+prova("Poche calorie: carboidrati mai sotto 130 g", poco.grammi.c >= 130, true);
+prova("Percentuali dai grammi fanno 100", (({ c, p, g }) => c + p + g)(val.perc), 100);
+const fuori = E.controlliMacro({ grammi: E.grammiMacro(2930, { p: 30, g: 30 }), kcal: 2930, pesoRif: 80 });
+prova("Su misura 30% a 2.930 kcal: proteine troppe, consiglio 128–176 g", fuori.p, { stato: "alto", consiglio: "128–176 g" });
+prova("Su misura 20% grassi ok · 10% grassi pochi", [E.controlliMacro({ grammi: E.grammiMacro(2000, { p: 20, g: 20 }), kcal: 2000, pesoRif: 70 }).g, E.controlliMacro({ grammi: E.grammiMacro(2000, { p: 20, g: 10 }), kcal: 2000, pesoRif: 70 }).g?.stato], [null, "basso"]);
+prova("Ritmi per aumentare, 80 kg: +0,2 / +0,4 · 60 kg: +0,15 / +0,3", [E.ritmiAumentoPerPeso(80).map((r) => r.v), E.ritmiAumentoPerPeso(60).map((r) => r.v)], [[0.2, 0.4], [0.15, 0.3]]);
+prova("Ritmo troppo veloce: +0,5 a 80 kg sì · +0,4 no · −0,5 a 80 kg no", [E.ritmoTroppoVeloce(0.5, 80), E.ritmoTroppoVeloce(0.4, 80), E.ritmoTroppoVeloce(-0.5, 80)], [true, false, false]);
+// RITMO COME SCELTA (2026-10-30): segue il peso; i ritmi vecchi → la scelta più vicina (a pari distanza la più lenta)
+prova("Scelta «giu-costante»: 77,5 kg → −0,4 · 70 kg → −0,35", [E.ritmoDaScelta("giu-costante", 77.5), E.ritmoDaScelta("giu-costante", 70)], [-0.4, -0.35]);
+prova("Ritmi vecchi → scelta: −0,5 a 77,5 kg (−0,4 o −0,6: pari) → costante · +0,5 a 80 kg → su-deciso · 0 → mantenere", [E.sceltaVicina(-0.5, 77.5), E.sceltaVicina(0.5, 80), E.sceltaVicina(0, 80)], ["giu-costante", "su-deciso", "mantenere"]);
+prova("Ritmi vecchi degli amici: −0,3 a 58,5 kg → costante · −0,8 a 106 kg → deciso", [E.sceltaVicina(-0.30000000000000004, 58.5), E.sceltaVicina(-0.8, 106.45)], ["giu-costante", "giu-deciso"]);
+prova("Nome del ritmo", [E.nomeRitmo("giu-deciso"), E.nomeRitmo("su-dolce"), E.nomeRitmo("mantenere")], ["Deciso", "Dolce", "Mantenere"]);
+prova("Macro: grammi su 1.400 kcal (40/30/30)", JSON.stringify(E.grammiMacro(1400, { p: 30, g: 30 })), JSON.stringify({ c: 140, p: 105, g: 47 }));
+const io = { peso: 78, eta: 41, sesso: "M", basale: 1740 };
+prova("Attività: corsa 45 min, zona 3 (MET 9,3)", A.kcalAttivita({ ...io, tipo: "corsa", minuti: 45, zona: 3 }), { kcal: 486, fonte: "intensita", met: 9.3 });
+prova("Attività: corsa 7,2 km → dai km", A.kcalAttivita({ ...io, tipo: "corsa", minuti: 45, zona: 3, km: 7.2 }), { kcal: 534, fonte: "km" });
+prova("Attività: kcal dell'orologio vincono su tutto", A.kcalAttivita({ ...io, tipo: "corsa", minuti: 45, km: 7.2, battito: 150, kcalOrologio: 412 }), { kcal: 412, fonte: "orologio" });
+prova("Attività: battito medio 140 per 40 min (Keytel)", A.kcalAttivita({ ...io, tipo: "corsa", minuti: 40, zona: 3, battito: 140 }), { kcal: 497, fonte: "battito" });
+prova("Attività: battito troppo basso → si usa l'intensità", A.kcalAttivita({ ...io, tipo: "corsa", minuti: 40, zona: 3, battito: 80 }).fonte, "intensita");
+prova("Attività: «Altro» col MET dell'IA", A.kcalAttivita({ ...io, tipo: "altro", minuti: 60, metIA: A.metDaKcal(312, 78, 60) }), { kcal: 312, fonte: "ia", met: 5 });
+prova("Attività: senza minuti → nessun conto", A.kcalAttivita({ ...io, tipo: "pesi", zona: 3 }), null);
+prova("Attività: kettlebell 30 min, zona 4 (MET 9,8)", A.kcalAttivita({ ...io, tipo: "kettlebell", minuti: 30, zona: 4 }), { kcal: 343, fonte: "intensita", met: 9.8 });
+prova("Battito massimo a 41 anni e zona 3", [A.battitoMassimo(41), A.battitiZona(3, 41)], [179, [125, 143]]);
+{ // IA + tabella: chi vince (cibo.voceDaStima)
+  const v = (a) => { const x = C.voceDaStima(a); return `${x.kcal} ${x.fonte}`; };
+  prova("Tabella: quali si pesano crudi/secchi", ["Pasta di semola (cruda)", "Riso bianco (crudo)", "Ceci secchi", "Lenticchie secche", "Gnocchi di patate", "Prosciutto crudo", "Ceci lessati"].map(C.pesaCrudo), [true, true, true, true, false, false, false]);
+  prova("Gnocchi 200 g: IA 170 → vince la tabella (320)", v({ nome: "Gnocchi di patate", grammi: 200, kcal: 170, carboidrati: 38, proteine: 4, grassi: 1, tabella: "Gnocchi di patate" }), "320 tabella");
+  prova("Pasta cotta scambiata per cruda (200 g, IA 300) → resta l'IA", v({ nome: "Pasta cotta", grammi: 200, kcal: 300, carboidrati: 60, proteine: 10, grassi: 2, tabella: "Pasta di semola (cruda)" }), "300 ia");
+  prova("Pasta cruda 80 g, IA 280 → vince la tabella (282)", v({ nome: "Pasta", grammi: 80, kcal: 280, tabella: "Pasta di semola (cruda)" }), "282 tabella");
+  prova("Nome sbagliato del tutto (tabella ×4) → resta l'IA", v({ nome: "Pane", grammi: 100, kcal: 60, tabella: "Pane comune" }), "60 ia");
+  prova("Tabella molto sotto l'IA (×0,5) → resta l'IA", v({ nome: "Patate fritte", grammi: 200, kcal: 340, tabella: "Patate" }), "340 ia");
+}
+document.getElementById("totale").textContent = falliti ? `❌ ${falliti} prove fallite` : "✅ Tutte le prove superate";
+</script></body></html>
